@@ -28,9 +28,9 @@ writer ??= new Person("John Doe");
 writer.Name = "Eric Wong"; // allowed
 ```
 
-If you're not familiar with the feature. Essentially, you demarcate reference types with `?`s to annotate that a variable can possibly be null. When you try to perform an operation using a `Person?` that would result in a `NullReferenceException`, you receive a compiler error or warning, depending on how you've configured your project. When you check that a variable of type `Person?` is not null, from that point forward the compiler treats the variable as a `Person`, meaning it assumes it's not `null` and doesn't spit warnings or errors as long as it can guarantee it maintains a not-`null` state.
+If you're not familiar with the feature. Essentially, you demarcate reference types with `?`s to annotate that a variable can possibly be `null`. When you try to perform an operation using a `Person?` that would result in a `NullReferenceException`, you receive a compiler error or warning, depending on how you've configured your project. When you check that a variable of type `Person?` is not `null`, from that point forward the compiler treats the variable as a `Person`, meaning it assumes it's not `null` and doesn't spit warnings or errors as long as it can guarantee it maintains a not-`null` state.
 
-What this means is that if you have a method that takes a `Person?`, and you check that it isn't `null`, if you then pass it to a method that takes a `Person`, you can syntactically guarantee that a reference is not null and eliminate unnecessary checks within your application code.
+What this means is that if you have a method that takes a `Person?`, and you check that it isn't `null`, if you then pass it to a method that takes a `Person`, you can syntactically guarantee that a reference is not `null` and eliminate unnecessary checks within your application code.
 
 This feature is very useful, and you could imagine a similar feature for `int`s. Imagine a case where you perform arbitrary division on user input. You want to filter out `0`s to avoid divide by zero errors. You could define a `PositiveInt` which an `int` contextually gets "elevated" to over some scope such that the compiler can infer that, barring reflection, that `int` variable never stores anything less than `1`.
 
