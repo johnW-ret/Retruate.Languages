@@ -44,6 +44,28 @@ In this case, `n`'s "base type" gets inferred to an `int`. The compiler looks at
 
 You can imagine the problems that this could create in library code. F# developers may already be used to specifying [Units of Measure](https://learn.microsoft.com/en-us/dotnet/fsharp/language-reference/units-of-measure), where types that contain bit-equivalent values which could otherwise be added, subtracted, multiplied, etc., together are narrowed to a specific type to disallow unit conversion errors by embedding units into the type system. What if two different developers created their own `IntHigherThan5`s and the compiler was unable to coalesce them from its design (aside from the fact the two different names could be confusing for unaware programmers)?
 
+```
+// package A
+type IntHigherThan5 n = n > 5
+
+bool AddIntHigherThan5(int a, IntHigherThan5 n)
+{
+    return a + n;
+}
+
+// package B
+type IntIsHigherThan5 n = n > 5
+bool SubtractIntIsHigherThan5(int a, IntIsHigherThan5 n)
+{
+    return a - n;
+}
+
+// package C which consumes A and B 
+IntHigherThan5 num = 6;
+_ = SubtractIntIsHigherThan5(5, num); // should this be allowed?
+// now imagine if the types were units of measure (centimeter vs inch)
+```
+
 One potential solution would reduce the complexity, but likely the power, that programmers could create with predicate-based context-aware types, is to push the type generation process into the compiler.
 
 ```
