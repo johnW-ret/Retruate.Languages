@@ -28,7 +28,7 @@ writer ??= new Person("John Doe");
 writer.Name = "Eric Wong"; // allowed
 ```
 
-If you're not familiar with the feature. Essentially, you demarcate reference types with `?`s to annotate that a variable can possibly be `null`. When you try to perform an operation using a `Person?` that would result in a `NullReferenceException`, you receive a compiler error or warning, depending on how you've configured your project. When you check that a variable of type `Person?` is not `null`, from that point forward the compiler treats the variable as a `Person`, meaning it assumes it's not `null` and doesn't spit warnings or errors as long as it can guarantee it maintains a not-`null` state.
+If you're not familiar with the feature. Essentially, you demarcate reference types with `?`s to annotate that a variable can possibly be `null`. When you try to perform an operation using a `Person?` that could possibly result in a `NullReferenceException`, you receive either a compiler error or a warning, depending on how you've configured your project. When you check that a variable of type `Person?` is not `null`, from that point forward the compiler treats the variable as a `Person`, meaning it assumes it's not `null` and doesn't spit warnings or errors as long as it can guarantee it maintains a not-`null` state.
 
 What this means is that if you have a method that takes a `Person?`, and you check that it isn't `null`, if you then pass it to a method that takes a `Person`, you can syntactically guarantee that a reference is not `null` and eliminate unnecessary checks within your application code.
 
@@ -198,3 +198,32 @@ This comes from what you might expect given [the first section](#static-analysis
 
 ## explicit closure
 Closures are fine, but in non-functional languages, I generally find that I can more quickly get a better idea what traditional object-oriented code is doing than code that uses a lot of anonymous functions. Anonymous functions also cannot (?) be inlined by the compiler. I don't know exactly how this translates to language design yet, but prefer local (nested) functions before anonymous functions to be explicit about when and how you're capturing state from the current context, then elevating to `struct`s or `class`es when ready. Maybe the language should enforce this?
+
+## peeping-scope with tuples
+```
+record Person(Properties properties, bool isAlive)
+{
+    public record Properties(int Age, string Name, Color favoriteColor);
+}
+
+var person = new Person ...;
+
+person.properties.(Age = 30, Name = "Bob");
+
+// tuple or anonymous type? not sure
+// tuple assignment
+(int __age, string __name) = person.properties.(Age, Name);
+```
+```
+// can be used with control flow
+int insurancePremium = 
+    switch person.properties.(Age, Color)
+    {
+        (<5, _) => 30,
+        (>=6 and <21, _) => 50,
+        (>=21 and <50, Color.Red) => 70,
+        (>=21 and <50, Color.Blue) => 90,
+        (>=21 and <50, _) => 100,
+        (>=50, _) => int.MaxValue
+    }
+```
